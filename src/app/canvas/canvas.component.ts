@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import { Task, XY } from './../models/Task';
+import { Task } from '../models/Task';
 
 @Component({
   selector: 'app-canvas',
@@ -11,8 +11,8 @@ export class CanvasComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas')
   canvasElement: ElementRef<HTMLCanvasElement>;
 
-  heightTask: number = 50;
-  widthTask: number = 50;
+  heightTask = 50;
+  widthTask = 50;
   pixelStartColumn: number[] = [10 , 160, 310, 460];
   pixelStartLine: number[] = [10 , 110, 210, 310];
 
@@ -49,9 +49,17 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     // Affichage et centrage du texte ( max 2 caractères )
     this.canvas.font = '24px serif';
     if (task.id.length === 1) {
-      this.canvas.strokeText(task.id, (this.pixelStartColumn[column] + (this.widthTask / 2)) - 6, (this.pixelStartLine[line] + (this.heightTask / 2)) + 8, 50);
+      this.canvas
+        .strokeText(task.id,
+          (this.pixelStartColumn[column] + (this.widthTask / 2)) - 6,
+          (this.pixelStartLine[line] + (this.heightTask / 2)) + 8,
+          50);
     } else if (task.id.length === 2 ) {
-      this.canvas.strokeText(task.id, (this.pixelStartColumn[column] + (this.widthTask / 2)) - 12, (this.pixelStartLine[line] + (this.heightTask / 2)) + 8, 50);
+      this.canvas
+        .strokeText(task.id,
+          (this.pixelStartColumn[column] + (this.widthTask / 2)) - 12,
+          (this.pixelStartLine[line] + (this.heightTask / 2)) + 8,
+          50);
     }
 
 
@@ -59,12 +67,14 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     task.pointDaccrocheEntrant.x = this.pixelStartColumn[column];
     task.pointDaccrocheEntrant.y = (this.pixelStartLine[line] + (this.widthTask / 2));
     task.pointDaccrocheSortant.x = this.pixelStartColumn[column] + this.widthTask;
-    task.pointDaccrocheSortant.y = this.pixelStartLine[line] + (this.widthTask /2);
+    task.pointDaccrocheSortant.y = this.pixelStartLine[line] + (this.widthTask / 2);
   }
 
   drawLiaison(taskFrom: Task, taskTo: Task){
-    let headlen: number = 10;
-    let angle = Math.atan2(taskTo.pointDaccrocheEntrant.y - taskFrom.pointDaccrocheSortant.y, taskTo.pointDaccrocheEntrant.x - taskFrom.pointDaccrocheSortant.x);
+    const headlen = 10;
+    const angle = Math
+      .atan2(taskTo.pointDaccrocheEntrant.y - taskFrom.pointDaccrocheSortant.y,
+        taskTo.pointDaccrocheEntrant.x - taskFrom.pointDaccrocheSortant.x);
 
 
     // Trace la ligne de la tâche sortante à la tâche entrante
@@ -74,20 +84,26 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     this.canvas.stroke();
 
 
-    // Commence à tracer un côté de la flèche
+    // Commence à tracer un côté de du triangle
     this.canvas.beginPath();
     this.canvas.moveTo(taskTo.pointDaccrocheEntrant.x, taskTo.pointDaccrocheEntrant.y);
-    this.canvas.lineTo(taskTo.pointDaccrocheEntrant.x - headlen * Math.cos(angle - Math.PI / 7), taskTo.pointDaccrocheEntrant.y - headlen * Math.sin(angle - Math.PI / 7));
+    this.canvas
+      .lineTo(taskTo.pointDaccrocheEntrant.x - headlen * Math.cos(angle - Math.PI / 7),
+        taskTo.pointDaccrocheEntrant.y - headlen * Math.sin(angle - Math.PI / 7));
 
 
-    // Trace l'autre côté de la flèche
-    this.canvas.lineTo(taskTo.pointDaccrocheEntrant.x - headlen * Math.cos(angle + Math.PI / 7), taskTo.pointDaccrocheEntrant.y - headlen * Math.sin(angle + Math.PI / 7));
+    // Trace l'autre côté du triangle
+    this.canvas
+      .lineTo(taskTo.pointDaccrocheEntrant.x - headlen * Math.cos(angle + Math.PI / 7),
+        taskTo.pointDaccrocheEntrant.y - headlen * Math.sin(angle + Math.PI / 7));
 
-    // Ferme la flèche
+    // Ferme le triangle
     this.canvas.lineTo(taskTo.pointDaccrocheEntrant.x, taskTo.pointDaccrocheEntrant.y);
-    this.canvas.lineTo(taskTo.pointDaccrocheEntrant.x - headlen * Math.cos(angle - Math.PI / 7), taskTo.pointDaccrocheEntrant.y - headlen * Math.sin(angle - Math.PI / 7));
+    this.canvas
+      .lineTo(taskTo.pointDaccrocheEntrant.x - headlen * Math.cos(angle - Math.PI / 7),
+        taskTo.pointDaccrocheEntrant.y - headlen * Math.sin(angle - Math.PI / 7));
 
-    // Trace et rempli le triangle
+    // Trace et rempli le bout de la flèche (Le triangle)
     this.canvas.stroke();
     this.canvas.fill();
   }
