@@ -1,0 +1,15 @@
+.div-logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1 0 0;
+}
+
+.logo {
+  width: 9em;
+  height: 3.8em;
+}
+
+.home {
+  color: white;
+}
