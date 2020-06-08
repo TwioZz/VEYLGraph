@@ -7,7 +7,7 @@ export class Task {
     liaison: Liaison;
     pointDaccrocheEntrant: XY;
     pointDaccrocheSortant: XY;
-    placementVertical: number;
+    nextPlacementVertical: number;
 
     constructor(id: number, name: string, duree: number){
         this.id = id;
@@ -17,31 +17,31 @@ export class Task {
         this.liaison = new Liaison();
         this.pointDaccrocheEntrant = new XY();
         this.pointDaccrocheSortant = new XY();
-        this.placementVertical = -1;
+        this.nextPlacementVertical = 0;
     }
 
     calculateMaxDistance(): number {
         let tempDistance = 0;
         this.liaison.entrant.forEach((task: Task) => {
             const distanceParent = task.calculateMaxDistance();
-            if(distanceParent >= tempDistance) {
+            if (distanceParent >= tempDistance) {
                 tempDistance = distanceParent + 1;
             }
-        })
+        });
         return tempDistance;
     }
 
-    calculateMaxLine(): number { 
-        let maxLine = 0;
-        this.liaison.entrant.forEach((task: Task) => {
-            const maxLineTemp = task.placementVertical;
-            console.log(task);
-            console.log(maxLineTemp);
-            if(maxLineTemp >= maxLine) {
-                maxLine = maxLineTemp; 
-            }
-        })
-        return maxLine;
+    calculatePlacementVertical(): number {
+        let nextPlacementVertical = 0;
+        this.liaison.entrant.forEach((taskParent: Task) => {
+            taskParent.liaison.sortant.forEach((taskCousin: Task) => {
+              const nextPlacementVerticalTemp = taskCousin.nextPlacementVertical;
+              if (nextPlacementVerticalTemp >= nextPlacementVertical) {
+                nextPlacementVertical = nextPlacementVerticalTemp;
+              }
+            });
+        });
+        return nextPlacementVertical;
     }
 }
 

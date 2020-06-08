@@ -65,9 +65,14 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   drawGraph(){
     this.graph.tasks.forEach((task: Task) => {
-      this.drawTask(task, task.calculateMaxDistance(), task.calculateMaxLine());
-    }) 
-    
+      this.drawTask(task, task.calculateMaxDistance(), task.calculatePlacementVertical());
+    });
+
+    this.graph.tasks.forEach((taskForm: Task) => {
+      taskForm.liaison.sortant.forEach((taskTo: Task) => {
+        this.drawLiaison(taskForm, taskTo);
+      });
+    });
   }
 
   drawTask(task: Task, column: number, line: number) {
@@ -77,7 +82,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     // Enregistrement de la position de la tache
     task.pos.x = this.pixelStartColumn[column];
     task.pos.y = this.pixelStartLine[line];
-    task.placementVertical = task.placementVertical+1;
+    task.nextPlacementVertical = task.nextPlacementVertical + 1;
 
 
 
