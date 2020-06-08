@@ -1,5 +1,6 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { Task } from '../models/Task';
+import { Graph } from '../models/Graph';
 
 @Component({
   selector: 'app-canvas',
@@ -10,6 +11,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   @ViewChild('canvas')
   canvasElement: ElementRef<HTMLCanvasElement>;
+  graph: Graph;
 
   heightTask = 50;
   widthTask = 50;
@@ -26,15 +28,46 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.canvas = this.canvasElement.nativeElement.getContext('2d');
-    const task = new Task(1, '50', 5, null);
-    const task2 = new Task(2, '50', 5, null);
-    const task3 = new Task(3, '50', 5, null);
-    const task4 = new Task(4, '50', 5, null);
-    this.drawTask(task, 0, 0);
-    this.drawTask(task2, 1, 1);
-    this.drawTask(task3, 2, 2);
-    this.drawTask(task4, 3, 3);
-    this.drawLiaison(task, task4);
+    const task = new Task(1, '50', 5);
+    const task2 = new Task(2, '50', 5);
+    const task3 = new Task(3, '50', 5);
+    const task4 = new Task(4, '50', 5);
+    const task5 = new Task(5, '50', 5);
+
+    task.liaison.sortant.push(task2);
+    task2.liaison.entrant.push(task);
+
+    task.liaison.sortant.push(task3);
+    task3.liaison.entrant.push(task);
+
+    task2.liaison.sortant.push(task4);
+    task4.liaison.entrant.push(task2);
+
+    task4.liaison.sortant.push(task5);
+    task5.liaison.entrant.push(task4);
+
+    task3.liaison.sortant.push(task5);
+    task5.liaison.entrant.push(task3);
+
+    const tasks: Task[] = [];
+    tasks.push(task);
+    tasks.push(task2);
+    tasks.push(task3);
+    tasks.push(task4);
+    tasks.push(task5);
+    this.graph = new Graph(tasks);
+
+
+
+    this.drawGraph();
+
+  }
+
+  drawGraph(){
+    this.graph.tasks.forEach((task: Task) => {
+      this.drawTask(task, task.calculateMaxDistance(), task.calculateMaxLine());
+    }) 
+    
   }
 
   drawTask(task: Task, column: number, line: number) {
@@ -44,6 +77,8 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     // Enregistrement de la position de la tache
     task.pos.x = this.pixelStartColumn[column];
     task.pos.y = this.pixelStartLine[line];
+    task.placementVertical = task.placementVertical+1;
+
 
 
     // Affichage et centrage du texte ( max 2 caractères )
