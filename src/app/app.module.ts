@@ -13,6 +13,11 @@ import { StepperCreateGraphComponent } from './card-create-graph/stepper-create-
 import {MatStepperModule} from '@angular/material/stepper';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
+import {MatTableModule} from '@angular/material/table';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatInputModule} from '@angular/material/input';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {OverlayModule} from '@angular/cdk/overlay';
 
 @NgModule({
   declarations: [
@@ -23,6 +28,7 @@ import {MatButtonModule} from '@angular/material/button';
     StepperCreateGraphComponent
   ],
   imports: [
+    OverlayModule,
     BrowserModule,
     BrowserAnimationsModule,
     MatToolbarModule,
@@ -30,7 +36,11 @@ import {MatButtonModule} from '@angular/material/button';
     MatCardModule,
     MatStepperModule,
     ReactiveFormsModule,
-    MatButtonModule
+    MatButtonModule,
+    MatTableModule,
+    MatExpansionModule,
+    MatInputModule,
+    MatTooltipModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,14 +1,77 @@
-<mat-horizontal-stepper labelPosition="bottom" #stepper>
-  <mat-step [stepControl]="firstFormGroup">
-    <form [formGroup]="firstFormGroup">
-      <ng-template matStepLabel>Sélection des tâches</ng-template>
-      <div>
-        <button mat-button matStepperNext>Suivant</button>
-      </div>
+<mat-horizontal-stepper labelPosition="bottom" linear #stepper (selectionChange)="onSelectionChange($event)">
+  <mat-step [stepControl]="tasksFormGroup">
+    <ng-template matStepLabel>Sélection des tâches</ng-template>
+    <form [formGroup]="tasksFormGroup">
+    <mat-accordion class="example-headers-align" multi>
+      <mat-expansion-panel *ngIf="tasksFormGroup.get('tasks')['controls'].length === 0" #emptyMatExpansionPanel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Aucune tâche créée
+          </mat-panel-title>
+          <mat-panel-description>
+            Pour ajouter une tâche cliquez sur le +
+            <div>
+              <mat-icon (click)="addTask(emptyMatExpansionPanel)">add_box</mat-icon>
+              <mat-icon class="red-icon" matTooltip="Aucune tâche créée">error</mat-icon>
+            </div>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+        <mat-expansion-panel *ngFor="let formGroupTask of tasksFormGroup.get('tasks')['controls']; index as i; last as isLast;" #matExpansionPanel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>{{ formGroupTask.value.name }}</mat-panel-title>
+            <mat-panel-description>
+              Modifier la tâche {{ formGroupTask.value.name }}
+              <div>
+                <mat-icon *ngIf="isLast" (click)="addTask(matExpansionPanel)">add_box</mat-icon>
+                <mat-icon (click)="deleteTask(i)">delete</mat-icon>
+                <mat-icon *ngIf="formGroupTask.invalid" class="red-icon" matTooltip="Erreur de saisie">error</mat-icon>
+              </div>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <mat-form-field>
+            <mat-label>Id</mat-label>
+            <input matInput [formControl]="formGroupTask.controls.id"/>
+            <mat-error *ngIf="formGroupTask.controls.id.hasError('pattern')">
+              L'identifiant doit être composé uniqument de chiffres
+            </mat-error>
+            <mat-error *ngIf="formGroupTask.controls.id.hasError('required')">
+              L'identifiant est obligatoire
+            </mat-error>
+            <mat-error *ngIf="formGroupTask.controls.id.hasError('max')">
+              L'identifiant maximum est de 99
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Nom</mat-label>
+            <input matInput [formControl]="formGroupTask.controls.name"/>
+            <mat-error *ngIf="formGroupTask.controls.name.hasError('required')">
+              Le nom est obligatoire
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Durée</mat-label>
+            <input matInput [formControl]="formGroupTask.controls.duree"/>
+            <mat-error *ngIf="formGroupTask.controls.duree.hasError('required')">
+              La durée est obligatoire
+            </mat-error>
+            <mat-error *ngIf="formGroupTask.controls.duree.hasError('max')">
+              La durée maximum est de 99
+            </mat-error>
+            <mat-error *ngIf="formGroupTask.controls.duree.hasError('pattern')">
+              La durée doit être composée uniqument de chiffres
+            </mat-error>
+          </mat-form-field>
+        </mat-expansion-panel>
+    </mat-accordion>
     </form>
+    <div class="buttons">
+      <span *ngIf="tasksFormGroup.invalid" class="red-icon">Erreur de saisie detectée </span>
+      <button mat-button mat-stroked-button color="primary" type="submit" matStepperNext [disabled]="tasksFormGroup.invalid">Suivant</button>
+    </div>
   </mat-step>
-  <mat-step [stepControl]="secondFormGroup">
-    <form [formGroup]="secondFormGroup">
+  <mat-step [stepControl]="liaisonsFormGroup">
+    <form [formGroup]="liaisonsFormGroup">
       <ng-template matStepLabel>Sélection des Liaisons</ng-template>
       <div>
         <button mat-button matStepperPrevious>Retour</button>
@@ -16,8 +79,8 @@
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="thirdFormGroup" optional>
-    <form [formGroup]="thirdFormGroup">
+  <mat-step [stepControl]="semaphoresFormGroup" optional>
+    <form [formGroup]="semaphoresFormGroup">
       <ng-template matStepLabel>Sélection des sémaphores</ng-template>
       <div>
         <button mat-button matStepperPrevious>Retour</button>

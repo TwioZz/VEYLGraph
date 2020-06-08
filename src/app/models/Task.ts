@@ -1,14 +1,16 @@
 import { Liaison } from './Liaison';
 export class Task {
-    id: string;
+    id: number;
+    name: string;
     pos: XY;
     duree: number;
-    liaison : Liaison;
+    liaison: Liaison;
     pointDaccrocheEntrant: XY;
     pointDaccrocheSortant: XY;
 
-    constructor(id: string, duree: number, liaison: Liaison = new Liaison()){
+    constructor(id: number, name: string, duree: number, liaison: Liaison = new Liaison()){
         this.id = id;
+        this.name = name;
         this.pos = new XY();
         this.duree = duree;
         this.liaison = liaison;

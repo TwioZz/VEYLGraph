@@ -26,10 +26,10 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.canvas = this.canvasElement.nativeElement.getContext('2d');
-    let task = new Task('50', 5, null);
-    let task2 = new Task('50', 5, null);
-    let task3 = new Task('50', 5, null);
-    let task4 = new Task('50', 5, null);
+    const task = new Task(1, '50', 5, null);
+    const task2 = new Task(2, '50', 5, null);
+    const task3 = new Task(3, '50', 5, null);
+    const task4 = new Task(4, '50', 5, null);
     this.drawTask(task, 0, 0);
     this.drawTask(task2, 1, 1);
     this.drawTask(task3, 2, 2);
@@ -48,15 +48,15 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
     // Affichage et centrage du texte ( max 2 caractères )
     this.canvas.font = '24px serif';
-    if (task.id.length === 1) {
+    if (task.id < 10) {
       this.canvas
-        .strokeText(task.id,
+        .strokeText(task.id.toString(),
           (this.pixelStartColumn[column] + (this.widthTask / 2)) - 6,
           (this.pixelStartLine[line] + (this.heightTask / 2)) + 8,
           50);
-    } else if (task.id.length === 2 ) {
+    } else {
       this.canvas
-        .strokeText(task.id,
+        .strokeText(task.id.toString(),
           (this.pixelStartColumn[column] + (this.widthTask / 2)) - 12,
           (this.pixelStartLine[line] + (this.heightTask / 2)) + 8,
           50);
