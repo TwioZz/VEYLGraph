@@ -1,4 +1,5 @@
 import { Liaison } from './Liaison';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 export class Task {
     id: number;
     name: string;
@@ -7,7 +8,6 @@ export class Task {
     liaison: Liaison;
     pointDaccrocheEntrant: XY;
     pointDaccrocheSortant: XY;
-    nextPlacementVertical: number;
 
     constructor(id: number, name: string, duree: number){
         this.id = id;
@@ -17,7 +17,6 @@ export class Task {
         this.liaison = new Liaison();
         this.pointDaccrocheEntrant = new XY();
         this.pointDaccrocheSortant = new XY();
-        this.nextPlacementVertical = 0;
     }
 
     calculateMaxDistance(): number {
@@ -31,17 +30,21 @@ export class Task {
         return tempDistance;
     }
 
-    calculatePlacementVertical(): number {
-        let nextPlacementVertical = 0;
-        this.liaison.entrant.forEach((taskParent: Task) => {
-            taskParent.liaison.sortant.forEach((taskCousin: Task) => {
-              const nextPlacementVerticalTemp = taskCousin.nextPlacementVertical;
-              if (nextPlacementVerticalTemp >= nextPlacementVertical) {
-                nextPlacementVertical = nextPlacementVerticalTemp;
-              }
+    calculateEndTime() {
+        return this.calculateStartTime() + this.duree;
+    }   
+
+    calculateStartTime() {
+        let startTime = 0;
+        if(this.calculateMaxDistance() !== 0) {
+            this.liaison.entrant.forEach((task: Task) => {
+                let maxCurrentTask = task.calculateEndTime() ;
+                if(maxCurrentTask > startTime) {
+                    startTime = maxCurrentTask;
+                }
             });
-        });
-        return nextPlacementVertical;
+        }
+        return startTime;
     }
 }
 

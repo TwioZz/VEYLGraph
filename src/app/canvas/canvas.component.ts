@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import { Task } from '../models/Task';
+import { Task, XY } from '../models/Task';
 import { Graph } from '../models/Graph';
 
 @Component({
@@ -28,26 +28,25 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.canvas = this.canvasElement.nativeElement.getContext('2d');
-    const task = new Task(1, '50', 5);
-    const task2 = new Task(2, '50', 5);
-    const task3 = new Task(3, '50', 5);
-    const task4 = new Task(4, '50', 5);
-    const task5 = new Task(5, '50', 5);
+    const task = new Task(1, '50', 30);
+    const task2 = new Task(2, '50', this.randomInt());
+    const task3 = new Task(3, '50', this.randomInt());
+    const task4 = new Task(4, '50', 0);
+    const task5 = new Task(5, '50', this.randomInt());
+    const task6 = new Task(6, '50', this.randomInt());
+    const task7 = new Task(7, '50', this.randomInt());
 
     task.liaison.sortant.push(task2);
     task2.liaison.entrant.push(task);
 
-    task.liaison.sortant.push(task3);
-    task3.liaison.entrant.push(task);
-
     task2.liaison.sortant.push(task4);
     task4.liaison.entrant.push(task2);
 
-    task4.liaison.sortant.push(task5);
-    task5.liaison.entrant.push(task4);
+    task.liaison.sortant.push(task3);
+    task3.liaison.entrant.push(task);
 
-    task3.liaison.sortant.push(task5);
-    task5.liaison.entrant.push(task3);
+    task3.liaison.sortant.push(task4);
+    task4.liaison.entrant.push(task3);
 
     const tasks: Task[] = [];
     tasks.push(task);
@@ -55,17 +54,25 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     tasks.push(task3);
     tasks.push(task4);
     tasks.push(task5);
+    tasks.push(task6);
+    tasks.push(task7);
     this.graph = new Graph(tasks);
-
-
-
-    this.drawGraph();
-
+    let time = 0;
+    setInterval(() => {
+      this.resetGraph();
+      this.drawGraph(time);
+      time = time + 1;
+    }, 1000);
   }
 
-  drawGraph(){
+  randomInt(){
+    return Math.floor(Math.random() * Math.floor(7));
+  }
+
+  drawGraph(time: number){
     this.graph.tasks.forEach((task: Task) => {
-      this.drawTask(task, task.calculateMaxDistance(), task.calculatePlacementVertical());
+      const maxDistanceTask = task.calculateMaxDistance();
+      this.drawTask(task, maxDistanceTask, this.graph.getY(maxDistanceTask), time);
     });
 
     this.graph.tasks.forEach((taskForm: Task) => {
@@ -75,39 +82,52 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     });
   }
 
-  drawTask(task: Task, column: number, line: number) {
-    this.canvas.strokeStyle = '#000000';
-    this.canvas.strokeRect(this.pixelStartColumn[column], this.pixelStartLine[line], this.widthTask, this.heightTask);
+  resetGraph() {
+    this.graph.coordAlreadyUse.clear();
+    this.canvas.clearRect(0, 0, 1000, 1000);
+  }
 
-    // Enregistrement de la position de la tache
+  drawTask(task: Task, column: number, line: number, time: number) {
+    // Affection et enregistrement de la position de la tache
     task.pos.x = this.pixelStartColumn[column];
     task.pos.y = this.pixelStartLine[line];
-    task.nextPlacementVertical = task.nextPlacementVertical + 1;
+    this.graph.addCoord(column);
 
+    // Carré vert avancement de la tâche
+    if(time > task.calculateStartTime() && time < task.calculateEndTime()){
+      let pourcentageAvancement = ((time - task.calculateStartTime()) * 100 / task.duree) / 100;
+      this.canvas.fillStyle = 'green';
+      this.canvas.fillRect(task.pos.x, task.pos.y + ((1 - pourcentageAvancement) * this.heightTask), this.widthTask, pourcentageAvancement * this.heightTask);
+    } else if(time >= task.calculateEndTime()) {
+      this.canvas.fillStyle = 'green';
+      this.canvas.fillRect(task.pos.x, task.pos.y, this.widthTask, this.heightTask);
+    }
 
+    // Dessin de la tâche
+    this.canvas.strokeStyle = '#000000';
+    this.canvas.strokeRect(task.pos.x, task.pos.y, this.widthTask, this.heightTask);
 
     // Affichage et centrage du texte ( max 2 caractères )
     this.canvas.font = '24px serif';
     if (task.id < 10) {
       this.canvas
         .strokeText(task.id.toString(),
-          (this.pixelStartColumn[column] + (this.widthTask / 2)) - 6,
-          (this.pixelStartLine[line] + (this.heightTask / 2)) + 8,
+          (task.pos.x + (this.widthTask / 2)) - 6,
+          (task.pos.y + (this.heightTask / 2)) + 8,
           50);
     } else {
       this.canvas
         .strokeText(task.id.toString(),
-          (this.pixelStartColumn[column] + (this.widthTask / 2)) - 12,
-          (this.pixelStartLine[line] + (this.heightTask / 2)) + 8,
+          (task.pos.x + (this.widthTask / 2)) - 12,
+          (task.pos.y + (this.heightTask / 2)) + 8,
           50);
     }
 
-
     // Enregistrement des points d'accroches
-    task.pointDaccrocheEntrant.x = this.pixelStartColumn[column];
-    task.pointDaccrocheEntrant.y = (this.pixelStartLine[line] + (this.widthTask / 2));
-    task.pointDaccrocheSortant.x = this.pixelStartColumn[column] + this.widthTask;
-    task.pointDaccrocheSortant.y = this.pixelStartLine[line] + (this.widthTask / 2);
+    task.pointDaccrocheEntrant.x = task.pos.x;
+    task.pointDaccrocheEntrant.y = (task.pos.y + (this.widthTask / 2));
+    task.pointDaccrocheSortant.x = task.pos.x + this.widthTask;
+    task.pointDaccrocheSortant.y = task.pos.y + (this.widthTask / 2);
   }
 
   drawLiaison(taskFrom: Task, taskTo: Task){
@@ -118,6 +138,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
 
     // Trace la ligne de la tâche sortante à la tâche entrante
+    this.canvas.strokeStyle = '#000000';
     this.canvas.beginPath();
     this.canvas.moveTo(taskFrom.pointDaccrocheSortant.x, taskFrom.pointDaccrocheSortant.y);
     this.canvas.lineTo(taskTo.pointDaccrocheEntrant.x, taskTo.pointDaccrocheEntrant.y);
@@ -125,6 +146,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
 
     // Commence à tracer un côté de du triangle
+    this.canvas.fillStyle = '#000000';
     this.canvas.beginPath();
     this.canvas.moveTo(taskTo.pointDaccrocheEntrant.x, taskTo.pointDaccrocheEntrant.y);
     this.canvas
