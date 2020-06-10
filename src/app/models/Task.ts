@@ -32,19 +32,33 @@ export class Task {
 
     calculateEndTime() {
         return this.calculateStartTime() + this.duree;
-    }   
+    }
 
     calculateStartTime() {
         let startTime = 0;
-        if(this.calculateMaxDistance() !== 0) {
+        if (this.calculateMaxDistance() !== 0) {
             this.liaison.entrant.forEach((task: Task) => {
-                let maxCurrentTask = task.calculateEndTime() ;
-                if(maxCurrentTask > startTime) {
+                const maxCurrentTask = task.calculateEndTime() ;
+                if (maxCurrentTask > startTime) {
                     startTime = maxCurrentTask;
                 }
             });
         }
         return startTime;
+    }
+
+    getAllExcludedTask(): Task[] {
+      const excludedTask: Task[] = this.liaison.entrant;
+      excludedTask.forEach((task: Task) => {
+        const currentTaskEntrante = task.getAllExcludedTask();
+        currentTaskEntrante.forEach((parentTask: Task) => {
+          excludedTask.push(parentTask);
+          parentTask.liaison.sortant.forEach((cousinTask: Task) => {
+            excludedTask.push(cousinTask);
+          });
+        });
+      });
+      return excludedTask;
     }
 }
 

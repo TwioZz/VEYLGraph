@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Task} from '../models/Task';
 
 @Component({
   selector: 'app-card-create-graph',
@@ -7,9 +8,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CardCreateGraphComponent implements OnInit {
 
+  @Output() tasksEventEmitter: EventEmitter<Task[]> = new EventEmitter<Task[]>();
+
   constructor() { }
 
   ngOnInit(): void {
   }
 
+  getTasksAndEmit($event: Task[]) {
+    this.tasksEventEmitter.emit($event);
+  }
 }

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import { Task, XY } from '../models/Task';
 import { Graph } from '../models/Graph';
 
@@ -7,11 +7,11 @@ import { Graph } from '../models/Graph';
   templateUrl: './canvas.component.html',
   styleUrls: ['./canvas.component.css']
 })
-export class CanvasComponent implements OnInit, AfterViewInit {
+export class CanvasComponent implements OnInit, AfterViewInit, OnChanges {
 
   @ViewChild('canvas')
   canvasElement: ElementRef<HTMLCanvasElement>;
-  graph: Graph;
+  @Input() graph: Graph;
 
   heightTask = 50;
   widthTask = 50;
@@ -23,11 +23,20 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   constructor() { }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.graph.currentValue) {
+      console.log(this.graph);
+      this.resetGraph();
+      this.drawGraph(0);
+    }
+  }
+
   ngOnInit(): void {
   }
 
   ngAfterViewInit(): void {
     this.canvas = this.canvasElement.nativeElement.getContext('2d');
+    /**
     const task = new Task(1, '50', 30);
     const task2 = new Task(2, '50', this.randomInt());
     const task3 = new Task(3, '50', this.randomInt());
@@ -63,6 +72,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
       this.drawGraph(time);
       time = time + 1;
     }, 1000);
+     **/
   }
 
   randomInt(){
@@ -84,7 +94,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
   resetGraph() {
     this.graph.coordAlreadyUse.clear();
-    this.canvas.clearRect(0, 0, 1000, 1000);
+    this.canvas.clearRect(0, 0, this.canvasElement.nativeElement.height, this.canvasElement.nativeElement.height);
   }
 
   drawTask(task: Task, column: number, line: number, time: number) {
@@ -95,7 +105,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
     // Carré vert avancement de la tâche
     if(time > task.calculateStartTime() && time < task.calculateEndTime()){
-      let pourcentageAvancement = ((time - task.calculateStartTime()) * 100 / task.duree) / 100;
+      const pourcentageAvancement = ((time - task.calculateStartTime()) * 100 / task.duree) / 100;
       this.canvas.fillStyle = 'green';
       this.canvas.fillRect(task.pos.x, task.pos.y + ((1 - pourcentageAvancement) * this.heightTask), this.widthTask, pourcentageAvancement * this.heightTask);
     } else if(time >= task.calculateEndTime()) {

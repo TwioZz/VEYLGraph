@@ -18,6 +18,10 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {MatInputModule} from '@angular/material/input';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {OverlayModule} from '@angular/cdk/overlay';
+import {MatSelectModule} from '@angular/material/select';
+import { HomeComponent } from './home/home.component';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatListModule} from '@angular/material/list';
 
 @NgModule({
   declarations: [
@@ -25,7 +29,8 @@ import {OverlayModule} from '@angular/cdk/overlay';
     CanvasComponent,
     ToolbarComponent,
     CardCreateGraphComponent,
-    StepperCreateGraphComponent
+    StepperCreateGraphComponent,
+    HomeComponent
   ],
   imports: [
     OverlayModule,
@@ -40,7 +45,10 @@ import {OverlayModule} from '@angular/cdk/overlay';
     MatTableModule,
     MatExpansionModule,
     MatInputModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatListModule
   ],
   providers: [],
   bootstrap: [AppComponent]

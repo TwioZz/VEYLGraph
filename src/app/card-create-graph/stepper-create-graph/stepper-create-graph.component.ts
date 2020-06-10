@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Task} from '../../models/Task';
 import {MatExpansionPanel} from '@angular/material/expansion';
-import {Graph} from '../../models/Graph';
 import {StepperSelectionEvent} from '@angular/cdk/stepper';
 
 @Component({
@@ -12,24 +11,22 @@ import {StepperSelectionEvent} from '@angular/cdk/stepper';
 })
 export class StepperCreateGraphComponent implements OnInit {
 
-  graph: Graph;
+  tasks: Task[];
   tasksFormGroup: FormGroup;
   liaisonsFormGroup: FormGroup;
-  semaphoresFormGroup: FormGroup;
+
+  @Output() tasksEventEmitter: EventEmitter<Task[]> = new EventEmitter<Task[]>();
 
   constructor(private formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
+    this.tasks = [];
     this.tasksFormGroup = new FormGroup({
       tasks: new FormArray([], Validators.required)
     });
 
-    this.liaisonsFormGroup = this.formBuilder.group({
-      liaisons: ['', Validators.required]
-    });
-
-    this.semaphoresFormGroup = this.formBuilder.group({
-      semaphores: ['']
+    this.liaisonsFormGroup = new FormGroup({
+      liaisons: new FormArray([])
     });
   }
 
@@ -42,7 +39,7 @@ export class StepperCreateGraphComponent implements OnInit {
       name: new FormControl('New Task ' + (tasksFormArray.length + 1),
         Validators.required),
       duree: new FormControl(1,
-        [Validators.required, Validators.pattern(/^-?(0|[1-9]\d*)?$/), Validators.max(99)])
+        [Validators.required, Validators.pattern(/^-?(0|[1-9]\d*)?$/), Validators.max(99)]),
     }));
   }
 
@@ -50,17 +47,55 @@ export class StepperCreateGraphComponent implements OnInit {
     (this.tasksFormGroup.get('tasks') as FormArray).removeAt(index);
   }
 
-  log(value) {
-    console.log(new Graph(this.tasksFormGroup.value));
-    console.log(value);
-    // console.log(JSON.parse(JSON.stringify(value)));
+  addLiaison() {
+    const liaisonsFormArray: FormArray = this.liaisonsFormGroup.get('liaisons') as FormArray;
+    this.resetAndSetLiaisons(liaisonsFormArray);
+
+    liaisonsFormArray.push(new FormGroup({
+      from: new FormControl('', Validators.required),
+      to: new FormControl('', Validators.required)
+    }));
+    this.emitTasks();
+  }
+
+  deleteLiaison(index: number) {
+    const liaisonsFormArray: FormArray = this.liaisonsFormGroup.get('liaisons') as FormArray;
+    liaisonsFormArray.removeAt(index);
+
+    this.resetAndSetLiaisons(liaisonsFormArray);
+    this.emitTasks();
+  }
+
+  resetAndSetLiaisons(liaisonsFormArray: FormArray) {
+    this.tasks.forEach((task: Task) => {
+      task.liaison.entrant = [];
+      task.liaison.sortant = [];
+    });
+
+    liaisonsFormArray.controls.forEach((formGroup: FormGroup) => {
+      if (formGroup.valid) {
+        const fromTask: Task = formGroup.value.from;
+        const toTask: Task = formGroup.value.to;
+
+        fromTask.liaison.sortant.push(toTask);
+        toTask.liaison.entrant.push(fromTask);
+      }
+    });
   }
 
   onSelectionChange($event: StepperSelectionEvent) {
     if ($event.previouslySelectedIndex === 0) {
-      this.graph = new Graph(this.tasksFormGroup.value.tasks.map((task: Task) => {
+      this.tasks = this.tasksFormGroup.value.tasks.map((task: Task) => {
         return new Task(task.id, task.name, task.duree);
-      }));
+      });
     }
+  }
+
+  log(test) {
+    console.log(test);
+  }
+
+  emitTasks() {
+    this.tasksEventEmitter.emit(this.tasks);
   }
 }

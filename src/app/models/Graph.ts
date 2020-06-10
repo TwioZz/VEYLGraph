@@ -9,7 +9,7 @@ export class Graph {
     }
 
     addCoord(x: number) {
-      if(this.coordAlreadyUse.has(x)) {
+      if (this.coordAlreadyUse.has(x)) {
         this.coordAlreadyUse.set(x, this.coordAlreadyUse.get(x) + 1);
       } else {
         this.coordAlreadyUse.set(x, 1);
@@ -17,12 +17,10 @@ export class Graph {
     }
 
     getY(x: number) {
-      if(this.coordAlreadyUse.has(x)) {
+      if (this.coordAlreadyUse.has(x)) {
         return this.coordAlreadyUse.get(x);
       } else {
         return 0;
     }
   }
-
-  
 }

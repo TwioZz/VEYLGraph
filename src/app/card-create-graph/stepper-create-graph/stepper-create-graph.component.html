@@ -73,18 +73,29 @@
   <mat-step [stepControl]="liaisonsFormGroup">
     <form [formGroup]="liaisonsFormGroup">
       <ng-template matStepLabel>Sélection des Liaisons</ng-template>
-      <div>
-        <button mat-button matStepperPrevious>Retour</button>
-        <button mat-button matStepperNext>Suivant</button>
-      </div>
-    </form>
-  </mat-step>
-  <mat-step [stepControl]="semaphoresFormGroup" optional>
-    <form [formGroup]="semaphoresFormGroup">
-      <ng-template matStepLabel>Sélection des sémaphores</ng-template>
-      <div>
-        <button mat-button matStepperPrevious>Retour</button>
-        <button mat-button matStepperNext>Suivant</button>
+        <button mat-button mat-stroked-button (click)="addLiaison()" [disabled]="liaisonsFormGroup.invalid">Ajouter une liaison</button>
+      <mat-list class="list">
+        <mat-list-item style="height: 100%" *ngFor="let liaisonFormGroup of liaisonsFormGroup.get('liaisons')['controls']; index as i; last as isLast">
+          <mat-form-field class="margin05">
+            <mat-label>De</mat-label>
+            <mat-select [formControl]="liaisonFormGroup.get('from')" [value]="liaisonFormGroup.get('from').value" [disabled]="!isLast">
+              <mat-option *ngFor="let task of tasks" [value]="task">{{ task.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Vers</mat-label>
+            <mat-select [formControl]="liaisonFormGroup.get('to')" [value]="liaisonFormGroup.get('to').value" [disabled]="!isLast || liaisonFormGroup.get('from').value === ''">
+              <mat-option *ngFor="let task of tasks" [value]="task">{{ task.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-icon-button class="buttonDelete" (click)="deleteLiaison(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <mat-divider></mat-divider>
+        </mat-list-item>
+      </mat-list>
+      <div class="buttons">
+        <button mat-button mat-stroked-button color="primary" type="submit" matStepperNext [disabled]="tasksFormGroup.invalid">Suivant</button>
       </div>
     </form>
   </mat-step>
