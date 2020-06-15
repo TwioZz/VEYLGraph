@@ -1,6 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {Graph} from '../models/Graph';
-import {Task} from '../models/Task';
 
 @Component({
   selector: 'app-home',
@@ -9,14 +7,8 @@ import {Task} from '../models/Task';
 })
 export class HomeComponent implements OnInit {
 
-  graph: Graph;
-
   constructor() { }
 
   ngOnInit(): void {
-  }
-
-  getTasks($event: Task[]) {
-    this.graph = new Graph($event);
   }
 }

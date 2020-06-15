@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import { Task, XY } from '../models/Task';
+import { Task } from '../models/Task';
 import { Graph } from '../models/Graph';
 
 @Component({
@@ -15,8 +15,8 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnChanges {
 
   heightTask = 50;
   widthTask = 50;
-  pixelStartColumn: number[] = [10 , 160, 310, 460];
-  pixelStartLine: number[] = [10 , 110, 210, 310];
+  pixelStartColumn: number[] = [10, 160, 310, 460, 610, 760, 910, 1060, 1210, 1360, 1510];
+  pixelStartLine: number[] = [10, 160, 310, 460, 610, 760, 910, 1060, 1210, 1360, 1510];
 
 
   canvas: CanvasRenderingContext2D;
@@ -25,7 +25,6 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.graph.currentValue) {
-      console.log(this.graph);
       this.resetGraph();
       this.drawGraph(0);
     }
@@ -36,50 +35,10 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     this.canvas = this.canvasElement.nativeElement.getContext('2d');
-    /**
-    const task = new Task(1, '50', 30);
-    const task2 = new Task(2, '50', this.randomInt());
-    const task3 = new Task(3, '50', this.randomInt());
-    const task4 = new Task(4, '50', 0);
-    const task5 = new Task(5, '50', this.randomInt());
-    const task6 = new Task(6, '50', this.randomInt());
-    const task7 = new Task(7, '50', this.randomInt());
-
-    task.liaison.sortant.push(task2);
-    task2.liaison.entrant.push(task);
-
-    task2.liaison.sortant.push(task4);
-    task4.liaison.entrant.push(task2);
-
-    task.liaison.sortant.push(task3);
-    task3.liaison.entrant.push(task);
-
-    task3.liaison.sortant.push(task4);
-    task4.liaison.entrant.push(task3);
-
-    const tasks: Task[] = [];
-    tasks.push(task);
-    tasks.push(task2);
-    tasks.push(task3);
-    tasks.push(task4);
-    tasks.push(task5);
-    tasks.push(task6);
-    tasks.push(task7);
-    this.graph = new Graph(tasks);
-    let time = 0;
-    setInterval(() => {
-      this.resetGraph();
-      this.drawGraph(time);
-      time = time + 1;
-    }, 1000);
-     **/
   }
 
-  randomInt(){
-    return Math.floor(Math.random() * Math.floor(7));
-  }
-
-  drawGraph(time: number){
+  drawGraph(time: number) {
+    this.resetGraph();
     this.graph.tasks.forEach((task: Task) => {
       const maxDistanceTask = task.calculateMaxDistance();
       this.drawTask(task, maxDistanceTask, this.graph.getY(maxDistanceTask), time);
@@ -94,7 +53,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnChanges {
 
   resetGraph() {
     this.graph.coordAlreadyUse.clear();
-    this.canvas.clearRect(0, 0, this.canvasElement.nativeElement.height, this.canvasElement.nativeElement.height);
+    this.canvas.clearRect(0, 0, 999999, 999999);
   }
 
   drawTask(task: Task, column: number, line: number, time: number) {
@@ -104,11 +63,12 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnChanges {
     this.graph.addCoord(column);
 
     // Carré vert avancement de la tâche
-    if(time > task.calculateStartTime() && time < task.calculateEndTime()){
+    if (time > task.calculateStartTime() && time < task.calculateEndTime()){
       const pourcentageAvancement = ((time - task.calculateStartTime()) * 100 / task.duree) / 100;
       this.canvas.fillStyle = 'green';
+      // tslint:disable-next-line:max-line-length
       this.canvas.fillRect(task.pos.x, task.pos.y + ((1 - pourcentageAvancement) * this.heightTask), this.widthTask, pourcentageAvancement * this.heightTask);
-    } else if(time >= task.calculateEndTime()) {
+    } else if (time >= task.calculateEndTime()) {
       this.canvas.fillStyle = 'green';
       this.canvas.fillRect(task.pos.x, task.pos.y, this.widthTask, this.heightTask);
     }

@@ -1,5 +1,7 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Task} from '../models/Task';
+import {Graph} from '../models/Graph';
+import {CanvasComponent} from '../canvas/canvas.component';
 
 @Component({
   selector: 'app-card-create-graph',
@@ -8,7 +10,8 @@ import {Task} from '../models/Task';
 })
 export class CardCreateGraphComponent implements OnInit {
 
-  @Output() tasksEventEmitter: EventEmitter<Task[]> = new EventEmitter<Task[]>();
+  graph: Graph;
+  @ViewChild(CanvasComponent) canvasComponent: CanvasComponent;
 
   constructor() { }
 
@@ -16,6 +19,10 @@ export class CardCreateGraphComponent implements OnInit {
   }
 
   getTasksAndEmit($event: Task[]) {
-    this.tasksEventEmitter.emit($event);
+    this.graph = new Graph($event);
+  }
+
+  graphAtTime(time: number) {
+    this.canvasComponent.drawGraph(time);
   }
 }

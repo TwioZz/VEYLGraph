@@ -84,8 +84,9 @@
           </mat-form-field>
           <mat-form-field>
             <mat-label>Vers</mat-label>
-            <mat-select [formControl]="liaisonFormGroup.get('to')" [value]="liaisonFormGroup.get('to').value" [disabled]="!isLast || liaisonFormGroup.get('from').value === ''">
-              <mat-option *ngFor="let task of tasks" [value]="task">{{ task.name }}</mat-option>
+            <mat-select [formControl]="liaisonFormGroup.get('to')" [value]="liaisonFormGroup.get('to').value"
+                        [disabled]="!isLast || liaisonFormGroup.get('from').value === ''" (selectionChange)="onSelectionChangeLi()">
+              <mat-option *ngFor="let task of tasks" [value]="task" [disabled]="liaisonFormGroup.get('from').value === task">{{ task.name }}</mat-option>
             </mat-select>
           </mat-form-field>
           <button mat-icon-button class="buttonDelete" (click)="deleteLiaison(i)">
@@ -100,7 +101,11 @@
     </form>
   </mat-step>
   <mat-step>
-    <ng-template matStepLabel>Récapitulatif & validation</ng-template>
+    <ng-template matStepLabel>Animation</ng-template>
+    <span class="buttonDelete">Temps : {{time}}</span>
+    <mat-slider class="slider" tickInterval="auto" thumbLabel [tickInterval]="1" min="0" [max]="getMaxTime()" [value]="time"
+                (valueChange)="graphAtTimeEmit($event)"></mat-slider>
+    <button mat-button mat-stroked-button color="primary" (click)="startAnimation()" class="animationB">Lancer l'animation</button>
     <div>
       <button mat-button matStepperPrevious>Retour</button>
       <button mat-button matStepperNext>Valider</button>

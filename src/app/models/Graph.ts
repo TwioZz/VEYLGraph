@@ -23,4 +23,17 @@ export class Graph {
         return 0;
     }
   }
+
+  getEndTime() {
+      let maxEndTime = 0;
+
+      this.tasks.forEach((task: Task) => {
+        const tempEndTime = task.calculateEndTime();
+        if (tempEndTime > maxEndTime) {
+          maxEndTime = tempEndTime;
+        }
+      });
+
+      return maxEndTime;
+  }
 }

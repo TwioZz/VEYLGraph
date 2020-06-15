@@ -22,6 +22,7 @@ import {MatSelectModule} from '@angular/material/select';
 import { HomeComponent } from './home/home.component';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatListModule} from '@angular/material/list';
+import {MatSliderModule} from '@angular/material/slider';
 
 @NgModule({
   declarations: [
@@ -32,24 +33,25 @@ import {MatListModule} from '@angular/material/list';
     StepperCreateGraphComponent,
     HomeComponent
   ],
-  imports: [
-    OverlayModule,
-    BrowserModule,
-    BrowserAnimationsModule,
-    MatToolbarModule,
-    MatIconModule,
-    MatCardModule,
-    MatStepperModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatTableModule,
-    MatExpansionModule,
-    MatInputModule,
-    MatTooltipModule,
-    MatSelectModule,
-    MatChipsModule,
-    MatListModule
-  ],
+    imports: [
+        OverlayModule,
+        BrowserModule,
+        BrowserAnimationsModule,
+        MatToolbarModule,
+        MatIconModule,
+        MatCardModule,
+        MatStepperModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatTableModule,
+        MatExpansionModule,
+        MatInputModule,
+        MatTooltipModule,
+        MatSelectModule,
+        MatChipsModule,
+        MatListModule,
+        MatSliderModule
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

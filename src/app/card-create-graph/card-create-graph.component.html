@@ -1,6 +1,7 @@
-<mat-card>
+<mat-card class="borderSolid">
   <mat-card-title>Création d'un graphe</mat-card-title>
-  <mat-card-content>
-    <app-stepper-create-graph (tasksEventEmitter)="getTasksAndEmit($event)"></app-stepper-create-graph>
+  <mat-card-content class="flexContainer">
+    <app-canvas [graph]="graph"></app-canvas>
+    <app-stepper-create-graph (tasksEventEmitter)="getTasksAndEmit($event)" (graphAtTime)="graphAtTime($event)" [graphForCode]="graph"></app-stepper-create-graph>
   </mat-card-content>
 </mat-card>

@@ -1,8 +1,9 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Task} from '../../models/Task';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {StepperSelectionEvent} from '@angular/cdk/stepper';
+import {Graph} from '../../models/Graph';
 
 @Component({
   selector: 'app-stepper-create-graph',
@@ -11,13 +12,18 @@ import {StepperSelectionEvent} from '@angular/cdk/stepper';
 })
 export class StepperCreateGraphComponent implements OnInit {
 
+  @Input() graphForCode: Graph;
   tasks: Task[];
   tasksFormGroup: FormGroup;
   liaisonsFormGroup: FormGroup;
 
-  @Output() tasksEventEmitter: EventEmitter<Task[]> = new EventEmitter<Task[]>();
+  time = 0;
+  animation;
 
-  constructor(private formBuilder: FormBuilder) { }
+  @Output() tasksEventEmitter: EventEmitter<Task[]> = new EventEmitter<Task[]>();
+  @Output() graphAtTime: EventEmitter<number> = new EventEmitter<number>();
+
+  constructor() { }
 
   ngOnInit(): void {
     this.tasks = [];
@@ -41,10 +47,14 @@ export class StepperCreateGraphComponent implements OnInit {
       duree: new FormControl(1,
         [Validators.required, Validators.pattern(/^-?(0|[1-9]\d*)?$/), Validators.max(99)]),
     }));
+
+    this.updateTasks();
   }
 
   deleteTask(index: number) {
     (this.tasksFormGroup.get('tasks') as FormArray).removeAt(index);
+
+    this.updateTasks();
   }
 
   addLiaison() {
@@ -86,13 +96,51 @@ export class StepperCreateGraphComponent implements OnInit {
   onSelectionChange($event: StepperSelectionEvent) {
     if ($event.previouslySelectedIndex === 0) {
       this.tasks = this.tasksFormGroup.value.tasks.map((task: Task) => {
-        return new Task(task.id, task.name, task.duree);
+        return new Task(task.id, task.name, Number(task.duree));
       });
+    }
+
+    this.emitTasks();
+  }
+
+  updateTasks() {
+    this.tasks = this.tasksFormGroup.value.tasks.map((task: Task) => {
+      return new Task(task.id, task.name, task.duree);
+    });
+    this.emitTasks();
+  }
+
+  onSelectionChangeLi() {
+    const liaisonsFormArray: FormArray = this.liaisonsFormGroup.get('liaisons') as FormArray;
+    this.resetAndSetLiaisons(liaisonsFormArray);
+    this.emitTasks();
+  }
+
+  graphAtTimeEmit($event: number) {
+    this.time = $event;
+    this.graphAtTime.emit(this.time);
+  }
+
+  getMaxTime() {
+    if (this.graphForCode !== undefined) {
+      return this.graphForCode.getEndTime();
     }
   }
 
-  log(test) {
-    console.log(test);
+  startAnimation() {
+    this.time = 0;
+    this.graphAtTime.emit(this.time);
+
+    const graphTime = this.graphForCode.getEndTime();
+    clearInterval(this.animation);
+    this.animation = setInterval(() => {
+      this.time = this.time + 1;
+      this.graphAtTime.emit(this.time);
+
+      if (this.time >= graphTime) {
+        clearInterval(this.animation);
+      }
+    }, 1000);
   }
 
   emitTasks() {

@@ -1,5 +1,4 @@
 import { Liaison } from './Liaison';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 export class Task {
     id: number;
     name: string;
